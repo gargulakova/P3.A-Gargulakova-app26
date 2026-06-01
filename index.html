@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redbull Drink - Studentská firma</title>
+    <style>
+        :root {
+            --pink-dark: #d67b7f;
+            --pink-light: #fbeeeef5;
+            --pink-accent: #e59396;
+            --text-color: #5a4647;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--pink-light);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(229, 147, 150, 0.15);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header img {
+            max-width: 220px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        header h1 {
+            color: var(--pink-dark);
+            font-size: 2rem;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-style: italic;
+            color: var(--pink-accent);
+        }
+
+        h2 {
+            color: var(--pink-dark);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--pink-light);
+            padding-bottom: 8px;
+        }
+
+        .product-list {
+            margin-bottom: 40px;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f9ebeb;
+        }
+
+        .product-info h3 {
+            font-size: 1.1rem;
+            color: #4a3b3c;
+        }
+
+        .product-info p {
+            font-size: 0.9rem;
+            color: #8a7375;
+        }
+
+        .product-order {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .price {
+            font-weight: bold;
+            color: var(--pink-dark);
+        }
+
+        .quantity-input {
+            width: 60px;
+            padding: 8px;
+            border: 1px solid var(--pink-accent);
+            border-radius: 8px;
+            text-align: center;
+            color: var(--text-color);
+            outline: none;
+        }
+
+        .summary-box {
+            background-color: var(--pink-light);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"], input[type="email"], input[type="tel"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0d0d0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus {
+            border-color: var(--pink-dark);
+            outline: none;
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            background-color: var(--pink-dark);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 30px;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--pink-accent);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <img src="logo.jpg" alt="Redbull Drink Logo">
+        <h1>Redbull Drink</h1>
+        <p>Exkluzivní míchané Red Bull drinky</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>Menu drinků</h2>
+            <div class="product-list" id="products-container">
+                <p>Načítám osvěžující nabídku...</p>
+            </div>
+        </section>
+
+        <section class="summary-box">
+            <span>Celkem kusů: <span id="total-count">0</span></span>
+            <span>Souhrnná cena: <span id="total-price">0</span> Kč</span>
+        </section>
+
+        <section>
+            <h2>Osobní údaje pro objednávku</h2>
+            <form id="order-form">
+                <div class="form-group">
+                    <label for="fullname">Jméno a příjmení</label>
+                    <input type="text" id="fullname" placeholder="např. Vendula Garguláková" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" placeholder="např. vendy2.gargulakova@gmail.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Telefon</label>
+                    <input type="tel" id="phone" placeholder="např. +420 773 206 098" required>
+                </div>
+
+                <button type="submit" class="submit-btn">Odeslat objednávku</button>
+            </form>
+        </section>
+    </main>
+</div>
+
+<script>
+    let productsData = [];
+
+    // Funkce pro načtení a parsování externího CSV souboru
+    async function loadProducts() {
+        try {
+            const response = await fetch('products.csv');
+            const data = await response.text();
+            
+            const lines = data.split('\n');
+            const container = document.getElementById('products-container');
+            container.innerHTML = ''; // Vyčištění loadovacího textu
+
+            // Projdeme řádky (přeskočíme první hlavičku)
+            for(let i = 1; i < lines.length; i++) {
+                if(lines[i].trim() === '') continue;
+                
+                const columns = lines[i].split(',');
+                const product = {
+                    id: columns[0],
+                    name: columns[1],
+                    description: columns[2],
+                    price: parseInt(columns[3])
+                };
+                productsData.push(product);
+
+                // Vytvoření HTML elementu pro produkt
+                const productHTML = `
+                    <div class="product-item">
+                        <div class="product-info">
+                            <h3>${product.name}</h3>
+                            <p>${product.description}</p>
+                        </div>
+                        <div class="product-order">
+                            <span class="price">${product.price} Kč</span>
+                            <input type="number" class="quantity-input" data-id="${product.id}" min="0" value="0" onchange="calculateTotal()">
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', productHTML);
+            }
+        } catch (error) {
+            console.error('Chyba při načítání CSV:', error);
+            document.getElementById('products-container').innerHTML = '<p>Nepodařilo se načíst menu.</p>';
+        }
+    }
+
+    // Výpočet celkové ceny a počtu kusů
+    function calculateTotal() {
+        let totalCount = 0;
+        let totalPrice = 0;
+        const inputs = document.querySelectorAll('.quantity-input');
+
+        inputs.forEach(input => {
+            const qty = parseInt(input.value) || 0;
+            if(qty > 0) {
+                const prodId = input.getAttribute('data-id');
+                const product = productsData.find(p => p.id === prodId);
+                if(product) {
+                    totalCount += qty;
+                    totalPrice += (qty * product.price);
+                }
+            }
+        });
+
+        document.getElementById('total-count').innerText = totalCount;
+        document.getElementById('total-price').innerText = totalPrice;
+    }
+
+    // Odeslání formuláře a otevření mailového klienta
+    document.getElementById('order-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('fullname').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        
+        let orderedItemsText = '';
+        const inputs = document.querySelectorAll('.quantity-input');
+        
+        inputs.forEach(input => {
+            const qty = parseInt(input.value) || 0;
+            if(qty > 0) {
+                const prodId = input.getAttribute('data-id');
+                const product = productsData.find(p => p.id === prodId);
+                orderedItemsText += `- ${product.name} (${qty}x)\n`;
+            }
+        });
+
+        if(orderedItemsText === '') {
+            alert('Vyberte prosím alespoň jeden drink před odesláním objednávky.');
+            return;
+        }
+
+        const totalPrice = document.getElementById('total-price').innerText;
+        const totalCount = document.getElementById('total-count').innerText;
+
+        // Sestavení textu e-mailu
+        const recipient = "app@kostka-skola.cz";
+        const subject = encodeURIComponent(`Objednávka - Redbull Drink - ${name}`);
+        
+        const bodyText = `Nová objednávka od: ${name}
+E-mail: ${email}
+Telefon: ${phone}
+
+Objednané zboží:
+${orderedItemsText}
+Celkem kusů: ${totalCount}
+Celková cena: ${totalPrice} Kč`;
+
+        const body = encodeURIComponent(bodyText);
+
+        // Otevření nativního e-mailového klienta
+        window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
+    });
+
+    // Spuštění načítání produktů při otevření stránky
+    window.onload = loadProducts;
+</script>
+
+</body>
+</html>
