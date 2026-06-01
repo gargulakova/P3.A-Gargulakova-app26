@@ -179,8 +179,7 @@
         <section>
             <h2>Menu drinků</h2>
             <div class="product-list" id="products-container">
-                <p>Načítám osvěžující nabídku...</p>
-            </div>
+                </div>
         </section>
 
         <section class="summary-box">
@@ -213,55 +212,38 @@
 </div>
 
 <script>
-    let productsData = [];
+    // Pevně definovaná data přímo v kódu pro eliminaci chyb s formátem CSV
+    const productsData = [
+        { id: 1, name: "Klasický Red Bull", description: "S marakujovým sirupem a sodou", price: 99 },
+        { id: 2, name: "Spring edice (Cherry Sakura)", description: "S malinovým sirupem a sodou", price: 99 },
+        { id: 3, name: "Coconut edice (Coconut & Berries)", description: "S ananasovým sirupem a sodou", price: 99 },
+        { id: 4, name: "Blue edice (Blueberry)", description: "Se sirupem lesní ovoce a sodou", price: 99 },
+        { id: 5, name: "Summer edice 2025 (White Peach)", description: "S birthday cake sirupem a sodou", price: 99 },
+        { id: 6, name: "Summer edice 2026 (Citrón)", description: "S mátovým sirupem a sodou", price: 99 },
+        { id: 7, name: "Lila edice sugarfree (Grep & Květiny)", description: "S malinovým sirupem a sodou", price: 99 },
+        { id: 8, name: "Ice edice (Vanilka & Borůvka)", description: "Se smetanou", price: 99 },
+        { id: 9, name: "Winter edice (Jablko & Zázvor)", description: "Podávané jako punč", price: 99 }
+    ];
 
-    async function loadProducts() {
-        try {
-            const response = await fetch('products.csv');
-            const data = await response.text();
-            
-            const lines = data.split('\n');
-            const container = document.getElementById('products-container');
-            container.innerHTML = '';
+    function renderProducts() {
+        const container = document.getElementById('products-container');
+        container.innerHTML = '';
 
-            for(let i = 1; i < lines.length; i++) {
-                if(lines[i].trim() === '') continue;
-                
-                // Inteligentní rozdělení podle čárky NEBO středníku
-                let columns = [];
-                if (lines[i].includes(';')) {
-                    columns = lines[i].split(';');
-                } else {
-                    columns = lines[i].split(',');
-                }
-                
-                const product = {
-                    id: columns[0] ? columns[0].trim() : i,
-                    name: columns[1] ? columns[1].trim() : '',
-                    description: columns[2] ? columns[2].trim() : '',
-                    price: columns[3] ? parseInt(columns[3].trim()) : 99
-                };
-                
-                productsData.push(product);
-
-                const productHTML = `
-                    <div class="product-item">
-                        <div class="product-info">
-                            <h3>${product.name}</h3>
-                            <p>${product.description}</p>
-                        </div>
-                        <div class="product-order">
-                            <span class="price">${product.price} Kč</span>
-                            <input type="number" class="quantity-input" data-id="${product.id}" min="0" value="0" onchange="calculateTotal()">
-                        </div>
+        productsData.forEach(product => {
+            const productHTML = `
+                <div class="product-item">
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p>${product.description}</p>
                     </div>
-                `;
-                container.insertAdjacentHTML('beforeend', productHTML);
-            }
-        } catch (error) {
-            console.error('Chyba při načítání CSV:', error);
-            document.getElementById('products-container').innerHTML = '<p>Nepodařilo se načíst menu.</p>';
-        }
+                    <div class="product-order">
+                        <span class="price">${product.price} Kč</span>
+                        <input type="number" class="quantity-input" data-id="${product.id}" min="0" value="0" onchange="calculateTotal()">
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', productHTML);
+        });
     }
 
     function calculateTotal() {
@@ -330,9 +312,8 @@ Celková cena: ${totalPrice} Kč`;
         window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
     });
 
-    window.onload = loadProducts;
+    window.onload = renderProducts;
 </script>
 
 </body>
 </html>
-     
