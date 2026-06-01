@@ -170,7 +170,7 @@
 
 <div class="container">
     <header>
-        <img src="logo.jpg" alt="Redbull Drink Logo">
+        <img src="Redbull.jpg" alt="Redbull Drink Logo">
         <h1>Redbull Drink</h1>
         <p>Exkluzivní míchané Red Bull drinky</p>
     </header>
@@ -215,7 +215,6 @@
 <script>
     let productsData = [];
 
-    // Funkce pro načtení a parsování externího CSV souboru
     async function loadProducts() {
         try {
             const response = await fetch('products.csv');
@@ -223,22 +222,28 @@
             
             const lines = data.split('\n');
             const container = document.getElementById('products-container');
-            container.innerHTML = ''; // Vyčištění loadovacího textu
+            container.innerHTML = '';
 
-            // Projdeme řádky (přeskočíme první hlavičku)
             for(let i = 1; i < lines.length; i++) {
                 if(lines[i].trim() === '') continue;
                 
-                const columns = lines[i].split(',');
+                // Inteligentní rozdělení podle čárky NEBO středníku
+                let columns = [];
+                if (lines[i].includes(';')) {
+                    columns = lines[i].split(';');
+                } else {
+                    columns = lines[i].split(',');
+                }
+                
                 const product = {
-                    id: columns[0],
-                    name: columns[1],
-                    description: columns[2],
-                    price: parseInt(columns[3])
+                    id: columns[0] ? columns[0].trim() : i,
+                    name: columns[1] ? columns[1].trim() : '',
+                    description: columns[2] ? columns[2].trim() : '',
+                    price: columns[3] ? parseInt(columns[3].trim()) : 99
                 };
+                
                 productsData.push(product);
 
-                // Vytvoření HTML elementu pro produkt
                 const productHTML = `
                     <div class="product-item">
                         <div class="product-info">
@@ -259,7 +264,6 @@
         }
     }
 
-    // Výpočet celkové ceny a počtu kusů
     function calculateTotal() {
         let totalCount = 0;
         let totalPrice = 0;
@@ -269,7 +273,7 @@
             const qty = parseInt(input.value) || 0;
             if(qty > 0) {
                 const prodId = input.getAttribute('data-id');
-                const product = productsData.find(p => p.id === prodId);
+                const product = productsData.find(p => p.id == prodId);
                 if(product) {
                     totalCount += qty;
                     totalPrice += (qty * product.price);
@@ -281,7 +285,6 @@
         document.getElementById('total-price').innerText = totalPrice;
     }
 
-    // Odeslání formuláře a otevření mailového klienta
     document.getElementById('order-form').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -296,8 +299,10 @@
             const qty = parseInt(input.value) || 0;
             if(qty > 0) {
                 const prodId = input.getAttribute('data-id');
-                const product = productsData.find(p => p.id === prodId);
-                orderedItemsText += `- ${product.name} (${qty}x)\n`;
+                const product = productsData.find(p => p.id == prodId);
+                if(product) {
+                    orderedItemsText += `- ${product.name} (${qty}x)\n`;
+                }
             }
         });
 
@@ -309,7 +314,6 @@
         const totalPrice = document.getElementById('total-price').innerText;
         const totalCount = document.getElementById('total-count').innerText;
 
-        // Sestavení textu e-mailu
         const recipient = "app@kostka-skola.cz";
         const subject = encodeURIComponent(`Objednávka - Redbull Drink - ${name}`);
         
@@ -323,14 +327,12 @@ Celkem kusů: ${totalCount}
 Celková cena: ${totalPrice} Kč`;
 
         const body = encodeURIComponent(bodyText);
-
-        // Otevření nativního e-mailového klienta
         window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
     });
 
-    // Spuštění načítání produktů při otevření stránky
     window.onload = loadProducts;
 </script>
 
 </body>
 </html>
+     
